@@ -9,18 +9,14 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>co.edu.eafit</groupId>
-	<artifactId>bank-transaction</artifactId>
+	<artifactId>bank-otp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>bank-transaction</name>
-	<description>Demo project for Spring Boot</description>
-	
+	<name>bank-customer</name>
+	<description>Bank OTP</description>
 	<properties>
 		<java.version>11</java.version>
-		<io.jsonwebtoken.version>0.11.2</io.jsonwebtoken.version>
 		<spring-cloud.version>2020.0.2</spring-cloud.version>
-		<org.jacoco.maven.plugin.version>0.8.6</org.jacoco.maven.plugin.version>
 	</properties>
-	
 	<dependencies>
 	
 		<dependency>
@@ -67,37 +63,8 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
-		
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-api</artifactId>
-			<version>${io.jsonwebtoken.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-impl</artifactId>
-			<version>${io.jsonwebtoken.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.jsonwebtoken</groupId>
-			<artifactId>jjwt-jackson</artifactId> <!-- or jjwt-gson if Gson is preferred -->
-			<version>${io.jsonwebtoken.version}</version>
-			<scope>runtime</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-		
-		<!-- WebFlux -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		
 		
@@ -153,46 +120,6 @@
                     </compilerArgs>
 				</configuration>
 			</plugin>
-			
-			<!-- Code Coverage -->
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>${org.jacoco.maven.plugin.version}</version>
-				<configuration>
-					<excludes>
-						<!-- exclude class -->
-						<exclude>co/edu/eafit/bank/BankTransactionApplication.class</exclude>
-						<exclude>co/edu/eafit/bank/controller/GeneralExceptionHandler.class</exclude>
-						
-						<!-- exclude classes in package -->
-						<exclude>co/edu/eafit/bank/dto/*</exclude>
-						<exclude>co/edu/eafit/bank/domain/*</exclude>
-						<exclude>co/edu/eafit/bank/mapper/*</exclude>
-						<exclude>co/edu/eafit/bank/repository/*</exclude>
-						<exclude>co/edu/eafit/bank/exception/*</exclude>
-						<exclude>co/edu/eafit/bank/security/*</exclude>
-						<exclude>co/edu/eafit/bank/entityservice/*</exclude>
-						
-					</excludes>
-				</configuration>
-				<executions>
-					<execution>
-						<id>prepare-agent</id>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>test</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<!-- Code Coverage -->
 			
 		</plugins>
 	</build>

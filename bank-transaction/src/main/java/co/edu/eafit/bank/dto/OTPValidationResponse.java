@@ -7,13 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TransferDTO {
+public class OTPValidationResponse {
 
-	private String accoIdOrigin;
-	private String accoIdDestination;
-	private Double amount;
-	private String userEmail;
-	private String token;
+	private Boolean valid;
+	private Integer doubleCheckCode;
+	private String errorMessage;
 	
-
 }
