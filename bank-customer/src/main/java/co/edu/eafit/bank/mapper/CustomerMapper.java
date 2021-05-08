@@ -18,7 +18,7 @@ import co.edu.eafit.bank.dto.CustomerDTO;
  *         approach.
  */
 @Mapper
-public interface CustomerMapper {
+public interface CustomerMapper {	
 	@Mapping(source = "documentType.dotyId", target = "dotyId_DocumentType")
 	public CustomerDTO customerToCustomerDTO(Customer customer);
 
