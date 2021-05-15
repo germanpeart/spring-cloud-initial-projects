@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -15,7 +14,6 @@ import co.edu.eafit.bank.domain.Transaction;
 import co.edu.eafit.bank.domain.TransactionType;
 import co.edu.eafit.bank.domain.Users;
 import co.edu.eafit.bank.dto.DepositDTO;
-import co.edu.eafit.bank.dto.OTPValidationRequest;
 import co.edu.eafit.bank.dto.OTPValidationResponse;
 import co.edu.eafit.bank.dto.TransactionResultDTO;
 import co.edu.eafit.bank.dto.TransferDTO;
@@ -25,12 +23,12 @@ import co.edu.eafit.bank.entityservice.TransactionService;
 import co.edu.eafit.bank.entityservice.TransactionTypeService;
 import co.edu.eafit.bank.entityservice.UsersService;
 import co.edu.eafit.bank.exception.ZMessManager;
-import co.edu.eafit.bank.openfeignclients.OTPServiceClient;
-import reactor.core.publisher.Mono;
+import lombok.extern.slf4j.Slf4j;
 
 
 @Service
 @Scope("singleton")
+@Slf4j
 public class BankTransactionServiceImpl implements BankTransactionService {
 
 	private final static Double COSTO = 2000.0;
@@ -46,13 +44,15 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 
 	@Autowired
 	TransactionService transactionService;
-
+	
 	@Autowired
-	OTPServiceClient otpServiceClient;
+	OTPServiceCircuitBreaker otpServiceCircuitBreaker;
 
 	@Override
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
 	public TransactionResultDTO transfer(TransferDTO transferDTO) throws Exception {
+		
+		log.info("Iniciando una transacción");
 
 		WithdrawDTO withdrawDTO = new WithdrawDTO(transferDTO.getAccoIdOrigin(), transferDTO.getAmount(),
 				transferDTO.getUserEmail());
@@ -87,13 +87,14 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 		}	
 
 		Users user = userOptional.get();
-		
+
 		//Validación del OTP (Invocación de microservicio)
-		OTPValidationResponse otpValidationResponse=validateToken(user.getUserEmail(), transferDTO.getToken());
-		
+		OTPValidationResponse otpValidationResponse=
+				otpServiceCircuitBreaker.validateToken(user.getUserEmail(), transferDTO.getToken());
+
 		if(otpValidationResponse==null || !otpValidationResponse.getValid()){
 			throw new Exception("No es un TOTP válido");
-			
+
 		}
 
 		Transaction transaction = new Transaction();
@@ -105,17 +106,11 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 		transaction.setUsers(user);
 
 		transactionService.save(transaction);
+		
+		log.info("Finalizando la transacción");
 
 		return new TransactionResultDTO(transaction.getTranId(), withdrawResult.getBalance());
 
-	}
-
-	//Método que se encarga de validar el Token TOTP
-	private OTPValidationResponse validateToken(String user, String otp) {
-
-		OTPValidationRequest otpValidationRequest = new OTPValidationRequest(user, otp);
-		return otpServiceClient.validateOTP(otpValidationRequest);
-		
 	}
 
 
