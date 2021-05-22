@@ -24,7 +24,7 @@ public interface CustomerMapper {
 
 	@Mapping(source = "dotyId_DocumentType", target = "documentType.dotyId")
 	public Customer customerDTOToCustomer(CustomerDTO customerDTO);
-
+	
 	public List<CustomerDTO> listCustomerToListCustomerDTO(List<Customer> customers);
 
 	public List<Customer> listCustomerDTOToListCustomer(List<CustomerDTO> customerDTOs);
